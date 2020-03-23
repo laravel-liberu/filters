@@ -1,0 +1,30 @@
+{
+    "name": "laravel-enso/filters",
+    "description": "Filters dependency for Laravel Enso",
+    "keywords": [
+        "laravel-enso",
+        "filters",
+        "date-interval"
+    ],
+    "homepage": "https://github.com/laravel-enso/filters",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adrian Ocneanu",
+            "email": "aocneanu@gmail.com",
+            "homepage": "https://laravel-enso.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "laravel/framework": "^7.0",
+        "laravel-enso/helpers": "1.15.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelEnso\\Filters\\": "src/"
+        }
+    }
+}
