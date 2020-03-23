@@ -101,10 +101,11 @@ class Interval implements Iterator
             case Intervals::ThisYear:
             case Intervals::LastYear:
             case Intervals::NextYear:
-                return $this->years()->montly();
+                return $this->years()->monthly();
             case Intervals::Custom:
-            case Intervals::All:
                 return $this->custom();
+            case Intervals::All:
+                return $this->all();
         }
     }
 
@@ -156,7 +157,7 @@ class Interval implements Iterator
         return $this;
     }
 
-    private function montly(): self
+    private function monthly(): self
     {
         $this->incrementer = fn (Carbon $date) => $date->addMonth();
         $this->labelFormat = 'M-y';
@@ -189,8 +190,31 @@ class Interval implements Iterator
         } elseif ($days <= 31) {
             $this->daily();
         } elseif ($days <= 365) {
-            $this->montly();
+            $this->monthly();
         } else {
+            $this->yearly();
+        }
+
+        return $this;
+    }
+
+    private function all(): self
+    {
+        if ($this->min->isSameDay($this->max)) {
+            $this->min->startOfOur();
+            $this->max->startOfOur()->addHour();
+            $this->hourly();
+        } elseif ($this->min->copy()->addMonth()->gte($this->max)) {
+            $this->min->startOfDay();
+            $this->max->startOfDay()->addDay();
+            $this->daily();
+        } elseif ($this->min->copy()->addYear()->subMonth()->gte($this->max)) {
+            $this->min->startOfMonth();
+            $this->max->startOfMonth()->addMonth();
+            $this->monthly();
+        } else {
+            $this->min->startOfYear();
+            $this->max->startOfYear()->addYear();
             $this->yearly();
         }
 
