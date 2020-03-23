@@ -4,7 +4,7 @@ namespace LaravelEnso\Filters\App\Enums;
 
 use LaravelEnso\Enums\App\Services\Enum;
 
-class DateIntervals extends Enum
+class Intervals extends Enum
 {
     public const Today = 'today';
     public const ThisWeek = 'thisWeek';
@@ -19,7 +19,6 @@ class DateIntervals extends Enum
     public const NextMonth = 'nextMonth';
     public const NextYear = 'nextYear';
     public const Custom = 'custom';
-    public const All = 'all';
 
     private static array $adjustments = [
         self::Today => 0,
@@ -35,11 +34,6 @@ class DateIntervals extends Enum
         self::NextMonth => 1,
         self::NextYear => 1,
     ];
-
-    public static function isManual(string $type): bool
-    {
-        return in_array($type, [self::Custom, self::All]);
-    }
 
     public static function adjustment(string $type): ?int
     {

@@ -4,7 +4,7 @@ namespace LaravelEnso\Filters\App\Exceptions;
 
 use InvalidArgumentException;
 
-class InvalidArgument extends InvalidArgumentException
+class Interval extends InvalidArgumentException
 {
     public static function type(string $type)
     {

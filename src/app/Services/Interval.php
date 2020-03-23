@@ -5,10 +5,12 @@ namespace LaravelEnso\Filters\App\Services;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Config;
-use LaravelEnso\Filters\App\Enums\DateIntervals as Intervals;
-use LaravelEnso\Filters\App\Exceptions\InvalidArgument;
+use Iterator;
+use LaravelEnso\Filters\App\DTOs\Segment;
+use LaravelEnso\Filters\App\Enums\Intervals;
+use LaravelEnso\Filters\App\Exceptions\Interval as Exception;
 
-class DateInterval
+class Interval implements Iterator
 {
     private string $type;
     private ?Carbon $min;
@@ -18,8 +20,8 @@ class DateInterval
     private Carbon $start;
     private Carbon $end;
     private Closure $incrementer;
-    private Closure $formatter;
     private string $labelFormat;
+    private int $key;
 
     public function __construct(string $type, ?Carbon $min = null, ?Carbon $max = null)
     {
@@ -35,23 +37,19 @@ class DateInterval
         $this->scenario()->init();
     }
 
-    public function start(): Carbon
-    {
-        $formatter = $this->formatter;
-
-        return $formatter($this->start);
-    }
-
-    public function end(): Carbon
-    {
-        $formatter = $this->formatter;
-
-        return $formatter($this->end);
-    }
-
     public function labels(): array
     {
         return $this->labels;
+    }
+
+    public function current(): Segment
+    {
+        return new Segment($this->start, $this->end);
+    }
+
+    public function key(): int
+    {
+        return $this->key;
     }
 
     public function next(): void
@@ -61,6 +59,7 @@ class DateInterval
         $incrementer = $this->incrementer;
         $incrementer($this->start);
         $incrementer($this->end);
+        $this->key++;
     }
 
     public function rewind(): void
@@ -79,108 +78,97 @@ class DateInterval
             case Intervals::Today:
             case Intervals::Yesterday:
             case Intervals::Tomorrow:
-                $this->days()->hourly();
-                break;
+                return $this->days()->hourly();
             case Intervals::ThisWeek:
             case Intervals::LastWeek:
             case Intervals::NextWeek:
-                $this->weeks()->daily();
-                break;
+                return $this->weeks()->daily();
             case Intervals::ThisMonth:
             case Intervals::LastMonth:
             case Intervals::NextMonth:
-                $this->months()->daily();
-                break;
+                return $this->months()->daily();
             case Intervals::ThisYear:
             case Intervals::LastYear:
             case Intervals::NextYear:
-                $this->years()->montly();
-                break;
+                return $this->years()->montly();
             case Intervals::Custom:
-            case Intervals::All:
-                $this->custom();
+                return $this->custom();
         }
-
-        return $this;
     }
 
     private function init(): void
     {
-        $formatter = $this->formatter;
         $incrementer = $this->incrementer;
-        $this->start = $formatter($this->min->copy());
+        $this->start = $this->min->copy();
         $this->end = $incrementer($this->start->copy());
+        $this->key = 0;
     }
 
-    private function hourly(): void
+    private function hourly(): self
     {
         $this->incrementer = fn (Carbon $date) => $date->addHour();
-        $this->formatter = fn (Carbon $date) => $date->startOfHour();
         $this->labelFormat = 'H';
-    }
-
-    private function days(): self
-    {
-        if (! Intervals::isManual($this->type)) {
-            $this->min = Carbon::today()->addDays($this->adjustment)->startOfDay();
-            $this->max = Carbon::today()->addDays($this->adjustment)->endOfDay();
-        }
 
         return $this;
     }
 
-    private function daily(): void
+    private function days(): self
+    {
+        $this->min = Carbon::today()->addDays($this->adjustment)->startOfDay();
+        $this->max = Carbon::today()->addDays($this->adjustment)->endOfDay();
+
+        return $this;
+    }
+
+    private function daily(): self
     {
         $this->incrementer = fn (Carbon $date) => $date->addDay();
-        $this->formatter = fn (Carbon $date) => $date->startOfDay();
         $this->labelFormat = Config::get('enso.config.dateFormat');
+
+        return $this;
     }
 
     private function weeks(): self
     {
-        if (! Intervals::isManual($this->type)) {
-            $this->min = Carbon::today()->addWeeks($this->adjustment)->startOfWeek();
-            $this->max = Carbon::today()->addWeeks($this->adjustment)->endOfWeek();
-        }
+        $this->min = Carbon::today()->addWeeks($this->adjustment)->startOfWeek();
+        $this->max = Carbon::today()->addWeeks($this->adjustment)->endOfWeek();
 
         return $this;
     }
 
     private function months(): self
     {
-        if (! Intervals::isManual($this->type)) {
-            $this->min = Carbon::today()->addMonths($this->adjustment)->startOfMonth();
-            $this->max = Carbon::today()->addMonths($this->adjustment)->endOfMonth();
-        }
+        $this->min = Carbon::today()->addMonths($this->adjustment)->startOfMonth();
+        $this->max = Carbon::today()->addMonths($this->adjustment)->endOfMonth();
 
         return $this;
     }
 
-    private function montly(): void
+    private function montly(): self
     {
         $this->incrementer = fn (Carbon $date) => $date->addMonth();
-        $this->formatter = fn (Carbon $date) => $date->startOfMonth();
         $this->labelFormat = 'M-y';
+
+        return $this;
     }
 
     private function years(): self
     {
-        if (! Intervals::isManual($this->type)) {
-            $this->min = Carbon::today()->addYears($this->adjustment)->startOfYear();
-            $this->max = Carbon::today()->addYears($this->adjustment)->endOfYear();
-        }
+        $this->min = Carbon::today()->addYears($this->adjustment)->startOfYear();
+        $this->max = Carbon::today()->addYears($this->adjustment)->endOfYear();
 
         return $this;
     }
 
-    private function yearly(): void
+    private function yearly(): self
     {
         $this->incrementer = fn (Carbon $date) => $date->addYear();
-        $this->formatter = fn (Carbon $date) => $date->startOfYear();
         $this->labelFormat = 'Y';
+
+        return $this;
     }
 
-    private function custom(): void
+    private function custom(): self
     {
         $days = $this->max->diffInDays($this->min);
 
@@ -193,21 +181,23 @@ class DateInterval
         } else {
             $this->yearly();
         }
+
+        return $this;
     }
 
     private function validate(): void
     {
         if (! Intervals::keys()->contains($this->type)) {
-            throw InvalidArgument::type($this->type);
+            throw Exception::type($this->type);
         }
 
-        if (Intervals::isManual($this->type)) {
+        if ($this->type === Intervals::Custom) {
             if (! $this->min || ! $this->max) {
-                throw InvalidArgument::limit();
+                throw Exception::limit();
             }
 
             if ($this->min->isAfter($this->max)) {
-                throw InvalidArgument::interval();
+                throw Exception::interval();
             }
         }
     }

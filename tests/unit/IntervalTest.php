@@ -2,11 +2,11 @@
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
-use LaravelEnso\Filters\App\Enums\DateIntervals;
-use LaravelEnso\Filters\App\Services\DateInterval;
+use LaravelEnso\Filters\App\Enums\Intervals;
+use LaravelEnso\Filters\App\Services\Interval;
 use Tests\TestCase;
 
-class DateIntervalTest extends TestCase
+class IntervalTest extends TestCase
 {
     private string $type;
     private ?Carbon $min;
@@ -14,10 +14,9 @@ class DateIntervalTest extends TestCase
     private Carbon $initialStart;
     private Carbon $initialEnd;
     private Closure $incrementer;
-    private Closure $formatter;
     private string $labelFormat;
 
-    private DateInterval $interval;
+    private Interval $interval;
     private array $expectedStartDates;
     private array $expectedEndDates;
     private array $expectedLabels;
@@ -43,7 +42,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today();
         $this->initialEnd = Carbon::today()->addHour();
-        $this->type = DateIntervals::Today;
+        $this->type = Intervals::Today;
         $this->hourly();
     }
 
@@ -52,7 +51,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->startOfWeek();
         $this->initialEnd = Carbon::today()->startOfWeek()->addDay();
-        $this->type = DateIntervals::ThisWeek;
+        $this->type = Intervals::ThisWeek;
         $this->daily();
     }
 
@@ -61,7 +60,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->startOfMonth();
         $this->initialEnd = Carbon::today()->startOfMonth()->addDay();
-        $this->type = DateIntervals::ThisMonth;
+        $this->type = Intervals::ThisMonth;
         $this->daily();
     }
 
@@ -70,7 +69,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->startOfYear();
         $this->initialEnd = Carbon::today()->startOfYear()->addMonth();
-        $this->type = DateIntervals::ThisYear;
+        $this->type = Intervals::ThisYear;
         $this->monthly();
     }
 
@@ -79,7 +78,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::yesterday();
         $this->initialEnd = Carbon::yesterday()->addHour();
-        $this->type = DateIntervals::Yesterday;
+        $this->type = Intervals::Yesterday;
         $this->hourly();
     }
 
@@ -88,7 +87,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->subWeek()->startOfWeek();
         $this->initialEnd = Carbon::today()->subWeek()->startOfWeek()->addDay();
-        $this->type = DateIntervals::LastWeek;
+        $this->type = Intervals::LastWeek;
         $this->daily();
     }
 
@@ -97,7 +96,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->subMonth()->startOfMonth();
         $this->initialEnd = Carbon::today()->subMonth()->startOfMonth()->addDay();
-        $this->type = DateIntervals::LastMonth;
+        $this->type = Intervals::LastMonth;
         $this->daily();
     }
 
@@ -106,7 +105,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->subYear()->startOfYear();
         $this->initialEnd = Carbon::today()->subYear()->startOfYear()->addMonth();
-        $this->type = DateIntervals::LastYear;
+        $this->type = Intervals::LastYear;
         $this->monthly();
     }
 
@@ -115,7 +114,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::tomorrow();
         $this->initialEnd = Carbon::tomorrow()->addHour();
-        $this->type = DateIntervals::Tomorrow;
+        $this->type = Intervals::Tomorrow;
         $this->hourly();
     }
 
@@ -124,7 +123,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->addWeek()->startOfWeek();
         $this->initialEnd = Carbon::today()->addWeek()->startOfWeek()->addDay();
-        $this->type = DateIntervals::NextWeek;
+        $this->type = Intervals::NextWeek;
         $this->daily();
     }
 
@@ -133,7 +132,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->addMonth()->startOfMonth();
         $this->initialEnd = Carbon::today()->addMonth()->startOfMonth()->addDay();
-        $this->type = DateIntervals::NextMonth;
+        $this->type = Intervals::NextMonth;
         $this->daily();
     }
 
@@ -142,7 +141,7 @@ class DateIntervalTest extends TestCase
     {
         $this->initialStart = Carbon::today()->addYear()->startOfYear();
         $this->initialEnd = Carbon::today()->addYear()->startOfYear()->addMonth();
-        $this->type = DateIntervals::NextYear;
+        $this->type = Intervals::NextYear;
         $this->monthly();
     }
 
@@ -153,7 +152,7 @@ class DateIntervalTest extends TestCase
         $this->max = Carbon::today()->addDay();
         $this->initialStart = Carbon::today()->startOfDay();
         $this->initialEnd = Carbon::today()->startOfDay()->addHour();
-        $this->type = DateIntervals::Custom;
+        $this->type = Intervals::Custom;
         $this->hourly();
     }
 
@@ -164,7 +163,7 @@ class DateIntervalTest extends TestCase
         $this->max = Carbon::today()->addDays(5);
         $this->initialStart = Carbon::today()->startOfDay();
         $this->initialEnd = Carbon::today()->startOfDay()->addDay();
-        $this->type = DateIntervals::Custom;
+        $this->type = Intervals::Custom;
         $this->daily();
     }
 
@@ -175,7 +174,7 @@ class DateIntervalTest extends TestCase
         $this->max = Carbon::today()->addMonths(2);
         $this->initialStart = Carbon::today();
         $this->initialEnd = Carbon::today()->addMonth();
-        $this->type = DateIntervals::Custom;
+        $this->type = Intervals::Custom;
         $this->monthly();
     }
 
@@ -186,14 +185,13 @@ class DateIntervalTest extends TestCase
         $this->max = Carbon::today()->addYears(2);
         $this->initialStart = Carbon::today();
         $this->initialEnd = Carbon::today()->addYear();
-        $this->type = DateIntervals::Custom;
+        $this->type = Intervals::Custom;
         $this->yearly();
     }
 
     private function hourly()
     {
         $this->incrementer = fn (Carbon $date) => $date->addHour();
-        $this->formatter = fn (Carbon $date) => $date->startOfHour();
         $this->labelFormat = 'H';
         $this->handle();
     }
@@ -201,7 +199,6 @@ class DateIntervalTest extends TestCase
     private function daily()
     {
         $this->incrementer = fn (Carbon $date) => $date->addDay();
-        $this->formatter = fn (Carbon $date) => $date->startOfDay();
         $this->labelFormat = Config::get('enso.config.dateFormat');
         $this->handle();
     }
@@ -209,7 +206,6 @@ class DateIntervalTest extends TestCase
     private function monthly()
     {
         $this->incrementer = fn (Carbon $date) => $date->addMonth();
-        $this->formatter = fn (Carbon $date) => $date->startOfMonth();
         $this->labelFormat = 'M-y';
         $this->handle();
     }
@@ -217,7 +213,6 @@ class DateIntervalTest extends TestCase
     private function yearly()
     {
         $this->incrementer = fn (Carbon $date) => $date->addYear();
-        $this->formatter = fn (Carbon $date) => $date->startOfYear();
         $this->labelFormat = 'Y';
         $this->handle();
     }
@@ -231,10 +226,7 @@ class DateIntervalTest extends TestCase
 
     private function init()
     {
-        $this->interval = new DateInterval($this->type, $this->min, $this->max);
-        $formatter = $this->formatter;
-        $formatter($this->initialStart);
-        $formatter($this->initialEnd);
+        $this->interval = new Interval($this->type, $this->min, $this->max);
 
         return $this;
     }
@@ -245,8 +237,8 @@ class DateIntervalTest extends TestCase
             $this->expectedStartDates[] = $this->initialStart->toString();
             $this->expectedEndDates[] = $this->initialEnd->toString();
             $this->expectedLabels[] = $this->initialStart->format($this->labelFormat);
-            $this->actualStartDates[] = $this->interval->start()->toString();
-            $this->actualEndDates[] = $this->interval->end()->toString();
+            $this->actualStartDates[] = $this->interval->current()->start()->toString();
+            $this->actualEndDates[] = $this->interval->current()->end()->toString();
             $incrementer($this->initialStart);
             $incrementer($this->initialEnd);
             $this->interval->next();
