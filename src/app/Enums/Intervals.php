@@ -40,4 +40,9 @@ class Intervals extends Enum
     {
         return self::$adjustments[$type] ?? null;
     }
+
+    public static function isManual(string $type): bool
+    {
+        return in_array($type, [self::Custom, self::All]);
+    }
 }

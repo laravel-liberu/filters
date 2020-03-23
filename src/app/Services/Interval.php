@@ -92,6 +92,7 @@ class Interval implements Iterator
             case Intervals::NextYear:
                 return $this->years()->montly();
             case Intervals::Custom:
+            case Intervals::All:
                 return $this->custom();
         }
     }
@@ -191,7 +192,7 @@ class Interval implements Iterator
             throw Exception::type($this->type);
         }
 
-        if ($this->type === Intervals::Custom) {
+        if (Intervals::isManual($this->type)) {
             if (! $this->min || ! $this->max) {
                 throw Exception::limit();
             }
