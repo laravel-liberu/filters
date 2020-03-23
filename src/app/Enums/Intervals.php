@@ -21,26 +21,6 @@ class Intervals extends Enum
     public const Custom = 'custom';
     public const All = 'all';
 
-    private static array $adjustments = [
-        self::Today => 0,
-        self::ThisWeek => 0,
-        self::ThisMonth => 0,
-        self::ThisYear => 0,
-        self::Yesterday => -1,
-        self::LastWeek => -1,
-        self::LastMonth => -1,
-        self::LastYear => -1,
-        self::Tomorrow => 1,
-        self::NextWeek => 1,
-        self::NextMonth => 1,
-        self::NextYear => 1,
-    ];
-
-    public static function adjustment(string $type): ?int
-    {
-        return self::$adjustments[$type] ?? null;
-    }
-
     public static function isManual(string $type): bool
     {
         return in_array($type, [self::Custom, self::All]);

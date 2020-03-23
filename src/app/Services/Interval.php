@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Support\Facades\Config;
 use Iterator;
 use LaravelEnso\Filters\App\DTOs\Segment;
+use LaravelEnso\Filters\App\Enums\Adjustments;
 use LaravelEnso\Filters\App\Enums\Intervals;
 use LaravelEnso\Filters\App\Exceptions\Interval as Exception;
 
@@ -32,7 +33,7 @@ class Interval implements Iterator
         $this->validate();
 
         $this->labels = [];
-        $this->adjustment = Intervals::adjustment($this->type);
+        $this->adjustment = Adjustments::get($this->type);
 
         $this->scenario()->init();
     }
@@ -40,6 +41,16 @@ class Interval implements Iterator
     public function labels(): array
     {
         return $this->labels;
+    }
+
+    public function min(): Carbon
+    {
+        return $this->min;
+    }
+
+    public function max(): Carbon
+    {
+        return $this->max;
     }
 
     public function current(): Segment
@@ -54,7 +65,7 @@ class Interval implements Iterator
 
     public function next(): void
     {
-        $this->labels[] = $this->start->format($this->labelFormat);
+        $this->labels[] = $this->label();
 
         $incrementer = $this->incrementer;
         $incrementer($this->start);
@@ -116,7 +127,7 @@ class Interval implements Iterator
     private function days(): self
     {
         $this->min = Carbon::today()->addDays($this->adjustment)->startOfDay();
-        $this->max = Carbon::today()->addDays($this->adjustment)->endOfDay();
+        $this->max = $this->min->copy()->addDay();
 
         return $this;
     }
@@ -132,7 +143,7 @@ class Interval implements Iterator
     private function weeks(): self
     {
         $this->min = Carbon::today()->addWeeks($this->adjustment)->startOfWeek();
-        $this->max = Carbon::today()->addWeeks($this->adjustment)->endOfWeek();
+        $this->max = $this->min->copy()->addWeek();
 
         return $this;
     }
@@ -140,7 +151,7 @@ class Interval implements Iterator
     private function months(): self
     {
         $this->min = Carbon::today()->addMonths($this->adjustment)->startOfMonth();
-        $this->max = Carbon::today()->addMonths($this->adjustment)->endOfMonth();
+        $this->max = $this->min->copy()->addMonth();
 
         return $this;
     }
@@ -156,7 +167,7 @@ class Interval implements Iterator
     private function years(): self
     {
         $this->min = Carbon::today()->addYears($this->adjustment)->startOfYear();
-        $this->max = Carbon::today()->addYears($this->adjustment)->endOfYear();
+        $this->max = $this->min->copy()->addYear();
 
         return $this;
     }
@@ -184,6 +195,13 @@ class Interval implements Iterator
         }
 
         return $this;
+    }
+
+    private function label(): string
+    {
+        return in_array($this->type, [Intervals::Today, Intervals::Yesterday, Intervals::Tomorrow])
+            ? $this->end->format($this->labelFormat)
+            : $this->start->format($this->labelFormat);
     }
 
     private function validate(): void
