@@ -19,6 +19,7 @@ class Intervals extends Enum
     public const NextMonth = 'nextMonth';
     public const NextYear = 'nextYear';
     public const Custom = 'custom';
+    public const All = 'all';
 
     private static array $adjustments = [
         self::Today => 0,
