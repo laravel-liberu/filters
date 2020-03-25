@@ -45,17 +45,17 @@ class Interval implements Iterator
 
     public function min(): Carbon
     {
-        return $this->min;
+        return $this->min->copy();
     }
 
     public function max(): Carbon
     {
-        return $this->max;
+        return $this->max->copy();
     }
 
     public function current(): Segment
     {
-        return new Segment($this->start, $this->end);
+        return new Segment($this->start->copy(), $this->end->copy());
     }
 
     public function key(): int
