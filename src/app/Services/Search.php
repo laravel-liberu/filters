@@ -7,8 +7,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LaravelEnso\Filters\App\Enums\ComparisonOperators;
 use LaravelEnso\Filters\App\Enums\SearchModes;
-use LaravelEnso\Select\App\Exceptions\ComparisonOperator;
-use LaravelEnso\Select\App\Exceptions\SearchMode;
+use LaravelEnso\Filters\App\Exceptions\ComparisonOperator;
+use LaravelEnso\Filters\App\Exceptions\SearchMode;
 
 class Search
 {
@@ -78,6 +78,10 @@ class Search
     {
         $this->attributes->each(fn ($attribute) => $query
             ->orWhere(fn ($query) => $this->matchAttribute($query, $attribute, $argument)));
+
+        if (! $this->relations) {
+            return;
+        }
 
         $this->relations->each(fn ($attribute) => $query
             ->orWhere(fn ($query) => $this->matchAttribute($query, $attribute, $argument, true)));
