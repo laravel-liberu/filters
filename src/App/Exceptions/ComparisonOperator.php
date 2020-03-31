@@ -10,4 +10,9 @@ class ComparisonOperator extends InvalidArgumentException
     {
         return new static(__('Unknown comparison operator provided'));
     }
+
+    public static function notInversable(string $operator)
+    {
+        return new static(__('The provided operator ":operator" is not inversable', ['operator' => $operator]));
+    }
 }

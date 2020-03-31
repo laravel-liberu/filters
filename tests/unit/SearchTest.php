@@ -68,6 +68,39 @@ class SearchTest extends TestCase
     }
 
     /** @test */
+    public function can_search_exact_match()
+    {
+        $search = $this->model->name;
+        $query = (new Search(SearchTestModel::query(), ['name'], $search))
+            ->searchMode(SearchModes::ExactMatch)
+            ->handle();
+
+        $this->assertTrue($this->model->is($query->first()));
+    }
+
+    /** @test */
+    public function does_not_return_results_if_searching_exact_match_with_partial_argument()
+    {
+        $search = $this->model->name[1];
+        $query = (new Search(SearchTestModel::query(), ['name'], $search))
+            ->searchMode(SearchModes::ExactMatch)
+            ->handle();
+
+        $this->assertEmpty($query->get());
+    }
+
+    /** @test */
+    public function can_search_doesnt_contain()
+    {
+        $search = $this->model->name[1];
+        $query = (new Search(SearchTestModel::query(), ['name'], $search))
+            ->searchMode(SearchModes::DoesntContain)
+            ->handle();
+
+        $this->assertEmpty($query->get());
+    }
+
+    /** @test */
     public function can_search_if_starts_with()
     {
         $search = $this->model->name[0];

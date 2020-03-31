@@ -14,12 +14,12 @@ class Search
 {
     private Builder $query;
     private Collection $attributes;
-    private string $search;
+    private $search;
     private ?Collection $relations;
     private string $searchMode;
     private string $comparisonOperator;
 
-    public function __construct(Builder $query, array $attributes, string $search)
+    public function __construct(Builder $query, array $attributes, $search)
     {
         $this->query = $query;
         $this->attributes = new Collection($attributes);
@@ -44,6 +44,8 @@ class Search
 
         $this->searchMode = $searchMode;
 
+        $this->syncOperator();
+
         return $this;
     }
 
@@ -55,16 +57,29 @@ class Search
 
         $this->comparisonOperator = $comparisonOperator;
 
+        $this->syncOperator();
+
         return $this;
     }
 
     public function handle(): Builder
     {
-        $this->searchArguments()->filter()
+        $excepted = new Collection([null, '']);
+
+        $this->searchArguments()->reject(fn ($argument) => $excepted->containsStrict($argument))
             ->each(fn ($argument) => $this->query
                 ->where(fn ($query) => $this->matchArgument($query, $argument)));
 
         return $this->query;
+    }
+
+    private function syncOperator()
+    {
+        if ($this->searchMode === SearchModes::ExactMatch) {
+            $this->comparisonOperator = ComparisonOperators::Equal;
+        } elseif ($this->searchMode === SearchModes::DoesntContain) {
+            if ($this->comparisonOperator = ComparisonOperators::invert($this->comparisonOperator));
+        }
     }
 
     private function searchArguments(): Collection
@@ -74,7 +89,7 @@ class Search
             : new Collection($this->search);
     }
 
-    private function matchArgument(Builder $query, string $argument): void
+    private function matchArgument(Builder $query, $argument): void
     {
         $this->attributes->each(fn ($attribute) => $query
             ->orWhere(fn ($query) => $this->matchAttribute($query, $attribute, $argument)));
@@ -87,7 +102,7 @@ class Search
             ->orWhere(fn ($query) => $this->matchAttribute($query, $attribute, $argument, true)));
     }
 
-    private function matchAttribute(Builder $query, string $attribute, string $argument, bool $relation = false): void
+    private function matchAttribute(Builder $query, string $attribute, $argument, bool $relation = false): void
     {
         $query->when(
             $relation && $this->isNested($attribute),
@@ -101,7 +116,7 @@ class Search
         return Str::contains($attribute, '.');
     }
 
-    private function matchSegments(Builder $query, string $attribute, string $argument)
+    private function matchSegments(Builder $query, string $attribute, $argument)
     {
         $attributes = (new Collection(explode('.', $attribute)));
 
@@ -109,15 +124,18 @@ class Search
             ->matchAttribute($query, $attributes->implode('.'), $argument, true));
     }
 
-    private function wildcards(string $argument): string
+    private function wildcards($argument): string
     {
         switch ($this->searchMode) {
             case SearchModes::Full:
+            case SearchModes::DoesntContain:
                 return '%'.$argument.'%';
             case SearchModes::StartsWith:
                 return $argument.'%';
             case SearchModes::EndsWith:
                 return '%'.$argument;
+            case SearchModes::ExactMatch:
+                return is_bool($argument) ? (int) $argument : $argument;
         }
     }
 }
