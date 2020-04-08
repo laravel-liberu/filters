@@ -212,8 +212,8 @@ class Interval implements Iterator
     private function all(): self
     {
         if ($this->min->isSameDay($this->max)) {
-            $this->min->startOfOur();
-            $this->max->startOfOur()->addHour();
+            $this->min->startOfHour();
+            $this->max->startOfHour()->addHour();
             $this->hourly();
         } elseif ($this->min->copy()->addMonth()->gte($this->max)) {
             $this->min->startOfDay();
