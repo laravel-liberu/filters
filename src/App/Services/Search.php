@@ -3,6 +3,7 @@
 namespace LaravelEnso\Filters\App\Services;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LaravelEnso\Filters\App\Enums\ComparisonOperators;
@@ -18,6 +19,7 @@ class Search
     private ?Collection $relations;
     private string $searchMode;
     private string $comparisonOperator;
+    private static array $algolia;
 
     public function __construct(Builder $query, array $attributes, $search)
     {
@@ -64,6 +66,10 @@ class Search
 
     public function handle(): Builder
     {
+        if ($this->searchMode === SearchModes::Algolia) {
+            return $this->algolia();
+        }
+
         $excepted = new Collection([null, '']);
 
         $this->searchArguments()->reject(fn ($argument) => $excepted->containsStrict($argument))
@@ -73,12 +79,36 @@ class Search
         return $this->query;
     }
 
+    private function algolia(): Builder
+    {
+        $model = $this->query->getModel();
+        $key = $this->query->getModel()->getKeyName();
+        $keys = $this->algoliaKeys($model, $key);
+
+        return $this->query->whereIn($key, $keys);
+    }
+
+    private function algoliaKeys(Model $model, string $key): array
+    {
+        $table = $model->getTable();
+
+        if (! isset(self::$algolia[$table][$this->search])) {
+            $paginator = $model::search($this->search)->paginate(100)->toArray();
+
+            $keys = (new Collection($paginator['data']))->pluck($key)->toArray();
+
+            self::$algolia[$table][$this->search] = $keys;
+        }
+
+        return self::$algolia[$table][$this->search];
+    }
+
     private function syncOperator()
     {
         if ($this->searchMode === SearchModes::ExactMatch) {
             $this->comparisonOperator = ComparisonOperators::Equal;
         } elseif ($this->searchMode === SearchModes::DoesntContain) {
-            if ($this->comparisonOperator = ComparisonOperators::invert($this->comparisonOperator));
+            $this->comparisonOperator = ComparisonOperators::invert($this->comparisonOperator);
         }
     }
 
