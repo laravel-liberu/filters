@@ -9,6 +9,7 @@ use Iterator;
 use LaravelEnso\Filters\App\DTOs\Segment;
 use LaravelEnso\Filters\App\Enums\Adjustments;
 use LaravelEnso\Filters\App\Enums\Intervals;
+use LaravelEnso\Filters\App\Enums\TimeSegments;
 use LaravelEnso\Filters\App\Exceptions\Interval as Exception;
 
 class Interval implements Iterator
@@ -23,6 +24,7 @@ class Interval implements Iterator
     private Closure $incrementer;
     private string $labelFormat;
     private int $key;
+    private int $timeSegment;
 
     public function __construct(string $type, ?Carbon $min = null, ?Carbon $max = null)
     {
@@ -83,6 +85,11 @@ class Interval implements Iterator
         return $this->start->isBefore($this->max);
     }
 
+    public function timeSegment(): int
+    {
+        return $this->timeSegment;
+    }
+
     private function scenario(): self
     {
         switch ($this->type) {
@@ -121,6 +128,7 @@ class Interval implements Iterator
     {
         $this->incrementer = fn (Carbon $date) => $date->addHour();
         $this->labelFormat = 'H';
+        $this->timeSegment = TimeSegments::Hourly;
 
         return $this;
     }
@@ -137,6 +145,7 @@ class Interval implements Iterator
     {
         $this->incrementer = fn (Carbon $date) => $date->addDay();
         $this->labelFormat = Config::get('enso.config.dateFormat');
+        $this->timeSegment = TimeSegments::Daily;
 
         return $this;
     }
@@ -161,6 +170,7 @@ class Interval implements Iterator
     {
         $this->incrementer = fn (Carbon $date) => $date->addMonth();
         $this->labelFormat = 'M-y';
+        $this->timeSegment = TimeSegments::Monthly;
 
         return $this;
     }
@@ -177,6 +187,7 @@ class Interval implements Iterator
     {
         $this->incrementer = fn (Carbon $date) => $date->addYear();
         $this->labelFormat = 'Y';
+        $this->timeSegment = TimeSegments::Yearly;
 
         return $this;
     }
@@ -201,8 +212,8 @@ class Interval implements Iterator
     private function all(): self
     {
         if ($this->min->isSameDay($this->max)) {
-            $this->min->startOfOur();
-            $this->max->startOfOur()->addHour();
+            $this->min->startOfHour();
+            $this->max->startOfHour()->addHour();
             $this->hourly();
         } elseif ($this->min->copy()->addMonth()->gte($this->max)) {
             $this->min->startOfDay();
