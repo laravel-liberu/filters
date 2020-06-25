@@ -1,9 +1,9 @@
 <?php
 
-namespace LaravelEnso\Filters\App\Enums;
+namespace LaravelEnso\Filters\Enums;
 
-use LaravelEnso\Enums\App\Services\Enum;
-use LaravelEnso\Filters\App\Exceptions\ComparisonOperator;
+use LaravelEnso\Enums\Services\Enum;
+use LaravelEnso\Filters\Exceptions\ComparisonOperator;
 
 class ComparisonOperators extends Enum
 {

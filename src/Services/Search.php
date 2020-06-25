@@ -1,15 +1,15 @@
 <?php
 
-namespace LaravelEnso\Filters\App\Services;
+namespace LaravelEnso\Filters\Services;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LaravelEnso\Filters\App\Enums\ComparisonOperators;
-use LaravelEnso\Filters\App\Enums\SearchModes;
-use LaravelEnso\Filters\App\Exceptions\ComparisonOperator;
-use LaravelEnso\Filters\App\Exceptions\SearchMode;
+use LaravelEnso\Filters\Enums\ComparisonOperators;
+use LaravelEnso\Filters\Enums\SearchModes;
+use LaravelEnso\Filters\Exceptions\ComparisonOperator;
+use LaravelEnso\Filters\Exceptions\SearchMode;
 
 class Search
 {

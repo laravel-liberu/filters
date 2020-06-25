@@ -1,8 +1,8 @@
 <?php
 
-namespace LaravelEnso\Filters\App\Enums;
+namespace LaravelEnso\Filters\Enums;
 
-use LaravelEnso\Enums\App\Services\Enum;
+use LaravelEnso\Enums\Services\Enum;
 
 class SearchModes extends Enum
 {

@@ -1,9 +1,9 @@
 <?php
 
 use Carbon\Carbon;
-use LaravelEnso\Filters\App\Enums\Intervals;
-use LaravelEnso\Filters\App\Exceptions\Interval as Exception;
-use LaravelEnso\Filters\App\Services\Interval;
+use LaravelEnso\Filters\Enums\Intervals;
+use LaravelEnso\Filters\Exceptions\Interval as Exception;
+use LaravelEnso\Filters\Services\Interval;
 use Tests\TestCase;
 
 class IntervalValidatorTest extends TestCase

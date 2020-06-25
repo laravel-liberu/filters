@@ -1,6 +1,6 @@
 # Filters
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4c084aada0bf4f70bf397338300bfc5d)](https://www.codacy.com/app/laravel-enso/filters?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=laravel-enso/filters&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/43caf05db3464c6ab3962a43c6036100)](https://www.codacy.com/gh/laravel-enso/filters?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=laravel-enso/filters&amp;utm_campaign=Badge_Grade)
 [![StyleCI](https://github.styleci.io/repos/85466970/shield?branch=master)](https://github.styleci.io/repos/85466970)
 [![License](https://poser.pugx.org/laravel-enso/filters/license)](https://packagist.org/packages/laravel-enso/filters)
 [![Total Downloads](https://poser.pugx.org/laravel-enso/filters/downloads)](https://packagist.org/packages/laravel-enso/filters)
