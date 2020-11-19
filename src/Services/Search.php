@@ -82,10 +82,11 @@ class Search
     private function algolia(): Builder
     {
         $model = $this->query->getModel();
+        $table = $this->query->getModel()->getTable();
         $key = $this->query->getModel()->getKeyName();
         $keys = $this->algoliaKeys($model, $key);
 
-        return $this->query->whereIn($key, $keys);
+        return $this->query->whereIn("{$table}.{$key}", $keys);
     }
 
     private function algoliaKeys(Model $model, string $key): array
