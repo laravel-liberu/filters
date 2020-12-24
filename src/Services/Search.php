@@ -5,6 +5,7 @@ namespace LaravelEnso\Filters\Services;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use LaravelEnso\Filters\Enums\ComparisonOperators;
 use LaravelEnso\Filters\Enums\SearchModes;
@@ -18,6 +19,7 @@ class Search
     private $search;
     private ?Collection $relations;
     private string $searchMode;
+    private ComparisonOperators $operators;
     private string $comparisonOperator;
     private static array $algolia;
 
@@ -27,7 +29,8 @@ class Search
         $this->attributes = new Collection($attributes);
         $this->search = $search;
         $this->searchMode = SearchModes::Full;
-        $this->comparisonOperator = ComparisonOperators::Like;
+        $this->operators = App::make(ComparisonOperators::class);
+        $this->comparisonOperator = $this->operators::Like;
         $this->relations = null;
     }
 
@@ -53,7 +56,7 @@ class Search
 
     public function comparisonOperator(string $comparisonOperator): self
     {
-        if (! ComparisonOperators::keys()->contains($comparisonOperator)) {
+        if (! $this->operators::keys()->contains($comparisonOperator)) {
             throw ComparisonOperator::unknown();
         }
 
@@ -107,9 +110,9 @@ class Search
     private function syncOperator()
     {
         if ($this->searchMode === SearchModes::ExactMatch) {
-            $this->comparisonOperator = ComparisonOperators::Equal;
+            $this->comparisonOperator = $this->operators::Equal;
         } elseif ($this->searchMode === SearchModes::DoesntContain) {
-            $this->comparisonOperator = ComparisonOperators::invert($this->comparisonOperator);
+            $this->comparisonOperator = $this->operators::invert($this->comparisonOperator);
         }
     }
 
