@@ -99,7 +99,7 @@ class Search
         if (! isset(self::$algolia[$table][$this->search])) {
             $paginator = $model::search($this->search)->paginate(100)->toArray();
 
-            $keys = (new Collection($paginator['data']))->pluck($key)->toArray();
+            $keys = Collection::wrap($paginator['data'])->pluck($key)->toArray();
 
             self::$algolia[$table][$this->search] = $keys;
         }
@@ -152,7 +152,7 @@ class Search
 
     private function matchSegments(Builder $query, string $attribute, $argument)
     {
-        $attributes = (new Collection(explode('.', $attribute)));
+        $attributes = new Collection(explode('.', $attribute));
 
         $query->whereHas($attributes->shift(), fn ($query) => $this
             ->matchAttribute($query, $attributes->implode('.'), $argument, true));
@@ -160,16 +160,12 @@ class Search
 
     private function wildcards($argument): string
     {
-        switch ($this->searchMode) {
-            case SearchModes::Full:
-            case SearchModes::DoesntContain:
-                return '%'.$argument.'%';
-            case SearchModes::StartsWith:
-                return $argument.'%';
-            case SearchModes::EndsWith:
-                return '%'.$argument;
-            case SearchModes::ExactMatch:
-                return is_bool($argument) ? (int) $argument : $argument;
-        }
+        return match ($this->searchMode) {
+            SearchModes::Full,
+            SearchModes::DoesntContain => '%'.$argument.'%',
+            SearchModes::StartsWith => $argument.'%',
+            SearchModes::EndsWith => '%'.$argument,
+            SearchModes::ExactMatch => is_bool($argument) ? (int) $argument : $argument,
+        };
     }
 }

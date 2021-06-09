@@ -14,9 +14,6 @@ use LaravelEnso\Filters\Exceptions\Interval as Exception;
 
 class Interval implements Iterator
 {
-    private string $type;
-    private ?Carbon $min;
-    private ?Carbon $max;
     private array $labels;
     private ?int $adjustment;
     private Carbon $start;
@@ -26,12 +23,11 @@ class Interval implements Iterator
     private int $key;
     private int $timeSegment;
 
-    public function __construct(string $type, ?Carbon $min = null, ?Carbon $max = null)
-    {
-        $this->type = $type;
-        $this->min = $min;
-        $this->max = $max;
-
+    public function __construct(
+        private string $type,
+        private ?Carbon $min = null,
+        private ?Carbon $max = null
+    ) {
         $this->validate();
 
         $this->labels = [];
@@ -92,28 +88,14 @@ class Interval implements Iterator
 
     private function scenario(): self
     {
-        switch ($this->type) {
-            case Intervals::Today:
-            case Intervals::Yesterday:
-            case Intervals::Tomorrow:
-                return $this->days()->hourly();
-            case Intervals::ThisWeek:
-            case Intervals::LastWeek:
-            case Intervals::NextWeek:
-                return $this->weeks()->daily();
-            case Intervals::ThisMonth:
-            case Intervals::LastMonth:
-            case Intervals::NextMonth:
-                return $this->months()->daily();
-            case Intervals::ThisYear:
-            case Intervals::LastYear:
-            case Intervals::NextYear:
-                return $this->years()->monthly();
-            case Intervals::Custom:
-                return $this->custom();
-            case Intervals::All:
-                return $this->all();
-        }
+        return match ($this->type) {
+            Intervals::Today, Intervals::Yesterday, Intervals::Tomorrow => $this->days()->hourly(),
+            Intervals::ThisWeek, Intervals::LastWeek, Intervals::NextWeek => $this->weeks()->daily(),
+            Intervals::ThisMonth, Intervals::LastMonth, Intervals::NextMonth => $this->months()->daily(),
+            Intervals::ThisYear, Intervals::LastYear, Intervals::NextYear, $this->years()->monthly(),
+            Intervals::Custom => $this->custom(),
+            Intervals::All => $this->all(),
+        };
     }
 
     private function init(): void

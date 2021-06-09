@@ -17,14 +17,11 @@ class ComparisonOperators extends Enum
 
     public static function invert(string $operator): string
     {
-        if ($operator === self::Like) {
-            return self::NotLike;
-        } elseif ($operator === self::ILike) {
-            return self::NotILike;
-        } elseif ($operator === self::Is) {
-            return self::IsNot;
-        } else {
-            throw ComparisonOperator::notInversable($operator);
-        }
+        return match ($operator) {
+            self::Like => self::NotLike,
+            self::ILike => self::NotILike,
+            self::Is => self::IsNot,
+            default => throw ComparisonOperator::notInversable($operator)
+        };
     }
 }

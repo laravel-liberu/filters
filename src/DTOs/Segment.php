@@ -6,13 +6,10 @@ use Carbon\Carbon;
 
 class Segment
 {
-    private Carbon $start;
-    private Carbon $end;
-
-    public function __construct(Carbon $start, Carbon $end)
-    {
-        $this->start = $start;
-        $this->end = $end;
+    public function __construct(
+        private Carbon $start,
+        private Carbon $end
+    ) {
     }
 
     public function start(): Carbon
