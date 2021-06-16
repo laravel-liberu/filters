@@ -88,8 +88,6 @@ class Interval implements Iterator
 
     private function scenario(): self
     {
-        \Log::info($this->type);
-
         return match ($this->type) {
             Intervals::Today, Intervals::Yesterday, Intervals::Tomorrow => $this->days()->hourly(),
             Intervals::ThisWeek, Intervals::LastWeek, Intervals::NextWeek => $this->weeks()->daily(),
