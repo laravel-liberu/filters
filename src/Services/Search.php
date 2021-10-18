@@ -21,7 +21,7 @@ class Search
     private string $searchMode;
     private ComparisonOperators $operators;
     private string $comparisonOperator;
-    private static array $algolia;
+    private static array $searchProvider;
 
     public function __construct(Builder $query, array $attributes, $search)
     {
@@ -43,7 +43,7 @@ class Search
 
     public function searchMode(string $searchMode): self
     {
-        if (! SearchModes::keys()->contains($searchMode)) {
+        if (!SearchModes::keys()->contains($searchMode)) {
             throw SearchMode::unknown();
         }
 
@@ -56,7 +56,7 @@ class Search
 
     public function comparisonOperator(string $comparisonOperator): self
     {
-        if (! $this->operators::keys()->contains($comparisonOperator)) {
+        if (!$this->operators::keys()->contains($comparisonOperator)) {
             throw ComparisonOperator::unknown();
         }
 
@@ -70,41 +70,41 @@ class Search
     public function handle(): Builder
     {
         if ($this->searchMode === SearchModes::Algolia) {
-            return $this->algolia();
+            return $this->searchProvider();
         }
 
-        $excepted = new Collection([null, '']);
+        $excepted = fn ($argument) => in_array($argument, [null, ''], true);
 
-        $this->searchArguments()->reject(fn ($argument) => $excepted->containsStrict($argument))
+        $this->searchArguments()->reject($excepted)
             ->each(fn ($argument) => $this->query
                 ->where(fn ($query) => $this->matchArgument($query, $argument)));
 
         return $this->query;
     }
 
-    private function algolia(): Builder
+    private function searchProvider(): Builder
     {
         $model = $this->query->getModel();
         $table = $this->query->getModel()->getTable();
         $key = $this->query->getModel()->getKeyName();
-        $keys = $this->algoliaKeys($model, $key);
+        $keys = $this->searchProviderKeys($model, $key);
 
         return $this->query->whereIn("{$table}.{$key}", $keys);
     }
 
-    private function algoliaKeys(Model $model, string $key): array
+    private function searchProviderKeys(Model $model, string $key): array
     {
         $table = $model->getTable();
 
-        if (! isset(self::$algolia[$table][$this->search])) {
+        if (!isset(self::$searchProvider[$table][$this->search])) {
             $paginator = $model::search($this->search)->paginate(100)->toArray();
 
             $keys = Collection::wrap($paginator['data'])->pluck($key)->toArray();
 
-            self::$algolia[$table][$this->search] = $keys;
+            self::$searchProvider[$table][$this->search] = array_slice($keys, 0, 10);
         }
 
-        return self::$algolia[$table][$this->search];
+        return self::$searchProvider[$table][$this->search];
     }
 
     private function syncOperator()
@@ -128,7 +128,7 @@ class Search
         $this->attributes->each(fn ($attribute) => $query
             ->orWhere(fn ($query) => $this->matchAttribute($query, $attribute, $argument)));
 
-        if (! $this->relations) {
+        if (!$this->relations) {
             return;
         }
 
@@ -162,9 +162,9 @@ class Search
     {
         return match ($this->searchMode) {
             SearchModes::Full,
-            SearchModes::DoesntContain => '%'.$argument.'%',
-            SearchModes::StartsWith => $argument.'%',
-            SearchModes::EndsWith => '%'.$argument,
+            SearchModes::DoesntContain => '%' . $argument . '%',
+            SearchModes::StartsWith => $argument . '%',
+            SearchModes::EndsWith => '%' . $argument,
             SearchModes::ExactMatch => is_bool($argument) ? (int) $argument : $argument,
         };
     }

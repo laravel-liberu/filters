@@ -11,5 +11,5 @@ class SearchModes extends Enum
     public const StartsWith = 'startsWith';
     public const EndsWith = 'endsWith';
     public const DoesntContain = 'doesntContain';
-    public const Algolia = 'algolia';
+    public const Algolia = 'searchProvider';
 }
