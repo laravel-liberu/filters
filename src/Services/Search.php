@@ -43,7 +43,7 @@ class Search
 
     public function searchMode(string $searchMode): self
     {
-        if (!SearchModes::keys()->contains($searchMode)) {
+        if (! SearchModes::keys()->contains($searchMode)) {
             throw SearchMode::unknown();
         }
 
@@ -56,7 +56,7 @@ class Search
 
     public function comparisonOperator(string $comparisonOperator): self
     {
-        if (!$this->operators::keys()->contains($comparisonOperator)) {
+        if (! $this->operators::keys()->contains($comparisonOperator)) {
             throw ComparisonOperator::unknown();
         }
 
@@ -96,7 +96,7 @@ class Search
     {
         $table = $model->getTable();
 
-        if (!isset(self::$searchProvider[$table][$this->search])) {
+        if (! isset(self::$searchProvider[$table][$this->search])) {
             $paginator = $model::search($this->search)->paginate(100)->toArray();
 
             $keys = Collection::wrap($paginator['data'])->pluck($key)->toArray();
@@ -125,15 +125,19 @@ class Search
 
     private function matchArgument(Builder $query, $argument): void
     {
-        $this->attributes->each(fn ($attribute) => $query
-            ->orWhere(fn ($query) => $this->matchAttribute($query, $attribute, $argument)));
+        $where = $this->searchMode === SearchModes::DoesntContain
+            ? 'where'
+            : 'orWhere';
 
-        if (!$this->relations) {
+        $this->attributes->each(fn ($attribute) => $query
+            ->{$where}(fn ($query) => $this->matchAttribute($query, $attribute, $argument)));
+
+        if (! $this->relations) {
             return;
         }
 
         $this->relations->each(fn ($attribute) => $query
-            ->orWhere(fn ($query) => $this->matchAttribute($query, $attribute, $argument, true)));
+            ->{$where}(fn ($query) => $this->matchAttribute($query, $attribute, $argument, true)));
     }
 
     private function matchAttribute(Builder $query, string $attribute, $argument, bool $relation = false): void
@@ -162,9 +166,9 @@ class Search
     {
         return match ($this->searchMode) {
             SearchModes::Full,
-            SearchModes::DoesntContain => '%' . $argument . '%',
-            SearchModes::StartsWith => $argument . '%',
-            SearchModes::EndsWith => '%' . $argument,
+            SearchModes::DoesntContain => '%'.$argument.'%',
+            SearchModes::StartsWith => $argument.'%',
+            SearchModes::EndsWith => '%'.$argument,
             SearchModes::ExactMatch => is_bool($argument) ? (int) $argument : $argument,
         };
     }
