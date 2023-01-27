@@ -1,26 +1,26 @@
 {
-    "name": "laravel-enso/filters",
+    "name": "cgdsoftware/filters",
     "description": "Filters dependency for Laravel Enso",
     "keywords": [
-        "laravel-enso",
+        "cgdsoftware",
         "filters",
         "date-interval"
     ],
-    "homepage": "https://github.com/laravel-enso/filters",
+    "homepage": "https://github.com/cgdsoftware/filters",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Adrian Ocneanu",
             "email": "aocneanu@gmail.com",
-            "homepage": "https://laravel-enso.com",
+            "homepage": "https://cgdsoftware.com",
             "role": "Developer"
         }
     ],
     "require": {
         "php": ">=8.0",
         "laravel/framework": "^9.0",
-        "laravel-enso/helpers": "^2.0"
+        "cgdsoftware/helpers": "^2.0"
     },
     "autoload": {
         "psr-4": {
