@@ -6,9 +6,9 @@
 [![Total Downloads](https://poser.pugx.org/laravel-enso/filters/downloads)](https://packagist.org/packages/laravel-enso/filters)
 [![Latest Stable Version](https://poser.pugx.org/laravel-enso/filters/version)](https://packagist.org/packages/laravel-enso/filters)
 
-Filters dependency for [Laravel Enso](https://github.com/laravel-enso/Enso).
+Filters dependency for [Laravel Liberu](https://github.com/laravel-enso/Liberu).
 
-This package can work independently of the [Enso](https://github.com/laravel-enso/Enso) ecosystem.
+This package can work independently of the [Liberu](https://github.com/laravel-enso/Liberu) ecosystem.
 
 For live examples and demos, you may visit [laravel-enso.com](https://www.laravel-enso.com)
 
