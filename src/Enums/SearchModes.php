@@ -6,10 +6,10 @@ use LaravelEnso\Enums\Services\Enum;
 
 class SearchModes extends Enum
 {
-    public const ExactMatch = 'exactMatch';
-    public const Full = 'full';
-    public const StartsWith = 'startsWith';
-    public const EndsWith = 'endsWith';
-    public const DoesntContain = 'doesntContain';
-    public const Algolia = 'searchProvider';
+    final public const ExactMatch = 'exactMatch';
+    final public const Full = 'full';
+    final public const StartsWith = 'startsWith';
+    final public const EndsWith = 'endsWith';
+    final public const DoesntContain = 'doesntContain';
+    final public const Algolia = 'searchProvider';
 }

@@ -7,13 +7,13 @@ use LaravelEnso\Filters\Exceptions\ComparisonOperator;
 
 class ComparisonOperators extends Enum
 {
-    public const Like = 'LIKE';
-    public const ILike = 'ILIKE';
-    public const Equal = '=';
-    public const Is = 'IS';
-    public const IsNot = 'IS NOT';
-    public const NotLike = 'NOT LIKE';
-    public const NotILike = 'NOT ILIKE';
+    final public const Like = 'LIKE';
+    final public const ILike = 'ILIKE';
+    final public const Equal = '=';
+    final public const Is = 'IS';
+    final public const IsNot = 'IS NOT';
+    final public const NotLike = 'NOT LIKE';
+    final public const NotILike = 'NOT ILIKE';
 
     public static function invert(string $operator): string
     {

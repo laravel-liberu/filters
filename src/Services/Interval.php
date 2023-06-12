@@ -15,7 +15,7 @@ use LaravelEnso\Filters\Exceptions\Interval as Exception;
 class Interval implements Iterator
 {
     private array $labels;
-    private ?int $adjustment;
+    private readonly ?int $adjustment;
     private Carbon $start;
     private Carbon $end;
     private Closure $incrementer;
@@ -24,7 +24,7 @@ class Interval implements Iterator
     private int $timeSegment;
 
     public function __construct(
-        private string $type,
+        private readonly string $type,
         private ?Carbon $min = null,
         private ?Carbon $max = null
     ) {

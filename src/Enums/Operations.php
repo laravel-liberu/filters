@@ -6,7 +6,7 @@ use LaravelEnso\Enums\Services\Enum;
 
 class Operations extends Enum
 {
-    public const None = 0;
-    public const Decrease = -1;
-    public const Increase = 1;
+    final public const None = 0;
+    final public const Decrease = -1;
+    final public const Increase = 1;
 }

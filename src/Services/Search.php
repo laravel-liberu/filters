@@ -14,20 +14,16 @@ use LaravelEnso\Filters\Exceptions\SearchMode;
 
 class Search
 {
-    private Builder $query;
-    private Collection $attributes;
-    private $search;
+    private readonly Collection $attributes;
     private ?Collection $relations;
     private string $searchMode;
-    private ComparisonOperators $operators;
+    private readonly ComparisonOperators $operators;
     private string $comparisonOperator;
     private static array $searchProvider;
 
-    public function __construct(Builder $query, array $attributes, $search)
+    public function __construct(private readonly Builder $query, array $attributes, private $search)
     {
-        $this->query = $query;
         $this->attributes = new Collection($attributes);
-        $this->search = $search;
         $this->searchMode = SearchModes::Full;
         $this->operators = App::make(ComparisonOperators::class);
         $this->comparisonOperator = $this->operators::Like;
@@ -119,7 +115,7 @@ class Search
     private function searchArguments(): Collection
     {
         return $this->searchMode === SearchModes::Full
-            ? new Collection(explode(' ', $this->search))
+            ? new Collection(explode(' ', (string) $this->search))
             : new Collection($this->search);
     }
 

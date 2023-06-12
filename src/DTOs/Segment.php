@@ -7,8 +7,8 @@ use Carbon\Carbon;
 class Segment
 {
     public function __construct(
-        private Carbon $start,
-        private Carbon $end
+        private readonly Carbon $start,
+        private readonly Carbon $end
     ) {
     }
 

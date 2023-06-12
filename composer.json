@@ -26,5 +26,8 @@
         "psr-4": {
             "LaravelEnso\\Filters\\": "src/"
         }
+    },
+    "require-dev": {
+        "rector/rector": "^0.17.0"
     }
 }
