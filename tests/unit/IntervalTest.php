@@ -2,8 +2,8 @@
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
-use LaravelEnso\Filters\Enums\Intervals;
-use LaravelEnso\Filters\Services\Interval;
+use LaravelLiberu\Filters\Enums\Intervals;
+use LaravelLiberu\Filters\Services\Interval;
 use Tests\TestCase;
 
 class IntervalTest extends TestCase

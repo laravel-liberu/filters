@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelEnso\Filters\DTOs;
+namespace LaravelLiberu\Filters\DTOs;
 
 use Carbon\Carbon;
 

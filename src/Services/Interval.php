@@ -1,16 +1,16 @@
 <?php
 
-namespace LaravelEnso\Filters\Services;
+namespace LaravelLiberu\Filters\Services;
 
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Config;
 use Iterator;
-use LaravelEnso\Filters\DTOs\Segment;
-use LaravelEnso\Filters\Enums\Adjustments;
-use LaravelEnso\Filters\Enums\Intervals;
-use LaravelEnso\Filters\Enums\TimeSegments;
-use LaravelEnso\Filters\Exceptions\Interval as Exception;
+use LaravelLiberu\Filters\DTOs\Segment;
+use LaravelLiberu\Filters\Enums\Adjustments;
+use LaravelLiberu\Filters\Enums\Intervals;
+use LaravelLiberu\Filters\Enums\TimeSegments;
+use LaravelLiberu\Filters\Exceptions\Interval as Exception;
 
 class Interval implements Iterator
 {

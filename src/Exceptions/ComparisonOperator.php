@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelEnso\Filters\Exceptions;
+namespace LaravelLiberu\Filters\Exceptions;
 
 use InvalidArgumentException;
 

@@ -3,8 +3,8 @@
 use Faker\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
-use LaravelEnso\Filters\Enums\SearchModes;
-use LaravelEnso\Filters\Services\Search;
+use LaravelLiberu\Filters\Enums\SearchModes;
+use LaravelLiberu\Filters\Services\Search;
 use Tests\TestCase;
 
 class SearchTest extends TestCase

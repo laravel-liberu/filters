@@ -2,9 +2,9 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
-use LaravelEnso\Filters\Exceptions\ComparisonOperator;
-use LaravelEnso\Filters\Exceptions\SearchMode;
-use LaravelEnso\Filters\Services\Search;
+use LaravelLiberu\Filters\Exceptions\ComparisonOperator;
+use LaravelLiberu\Filters\Exceptions\SearchMode;
+use LaravelLiberu\Filters\Services\Search;
 use Tests\TestCase;
 
 class SearchValidationTest extends TestCase
