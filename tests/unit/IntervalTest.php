@@ -199,7 +199,7 @@ class IntervalTest extends TestCase
     private function daily()
     {
         $this->incrementer = fn (Carbon $date) => $date->addDay();
-        $this->labelFormat = Config::get('enso.config.dateFormat');
+        $this->labelFormat = Config::get('liberu.config.dateFormat');
         $this->handle();
     }
 
